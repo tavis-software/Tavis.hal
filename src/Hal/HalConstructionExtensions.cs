@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Xml.Linq;
+using Tavis;
 
 
 namespace Hal
@@ -24,6 +25,10 @@ namespace Hal
 		}
 
 
+        public static IHalResource AddLink(this IHalResource resource, Link link)
+        {
+            return AddLink(resource, link.Relation, link.Target);
+        }
 		
 		public static IHalResource AddLink(this IHalResource resource, string rel, string href)
 		{

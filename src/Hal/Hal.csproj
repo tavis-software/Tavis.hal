@@ -40,9 +40,9 @@
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="Tavis.Link, Version=0.1.4514.17742, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Tavis.Link, Version=0.1.4525.37668, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Tavis.Link.0.1.4\lib\net40\Tavis.Link.dll</HintPath>
+      <HintPath>..\..\packages\Tavis.Link.0.1.5\lib\net40\Tavis.Link.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
