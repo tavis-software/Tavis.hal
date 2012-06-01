@@ -154,7 +154,7 @@ namespace HalTests
     <resource rel='item' name='2' href='http://work.com/todos/make-some-tea'>
         <title>Make tea</title>
         <content>For make drinking goodly tea that is green.</content>
-        <link rel='prev' href='http://home.com/tasks/126' />
+        <link rel='urn:tavis:prev' href='http://home.com/tasks/126' />
     </resource>
 </resource>";
 		}

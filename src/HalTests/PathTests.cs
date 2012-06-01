@@ -94,12 +94,14 @@ namespace HalTests
 			var hal = HalDocument.Parse(content);
 
 			//Act
-			var link = hal.FindLink("item[2]/prev");
+			var link = hal.FindLink("item[2]/urn:tavis:prev");  // Currently semi-colons cause a problem in paths.
 
 			//Assert
 			Assert.IsNotNull(link);
 			Assert.AreEqual("prev", link.Rel);
 		}
+
+
 
 		[TestMethod]
 		public void InvalidPathThrows()
