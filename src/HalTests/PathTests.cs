@@ -98,7 +98,7 @@ namespace HalTests
 
 			//Assert
 			Assert.IsNotNull(link);
-			Assert.AreEqual("prev", link.Rel);
+            Assert.AreEqual("urn:tavis:prev", link.Rel);
 		}
 
 

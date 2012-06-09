@@ -4,8 +4,8 @@ using System.Text.RegularExpressions;
 
 namespace Hal {
     public class HalPath {
-        private Regex _PathRegex = new Regex(@"/?(\w+)(?:\[(\w+)\])?");
-        //private Regex _PathRegex = new Regex(@"/?([\w\:\/]+)(?:\[(\w+)\])?");
+        //private Regex _PathRegex = new Regex(@"/?(\w+)(?:\[(\w+)\])?");
+        private Regex _PathRegex = new Regex(@"/?([\w\:]+)(?:\[(\w+)\])?");
         private readonly List<Segment> _Segments = new List<Segment>();
         
 		public IEnumerable<Segment> Segments { get { return _Segments; } }
