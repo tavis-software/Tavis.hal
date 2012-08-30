@@ -13,14 +13,18 @@ namespace Hal {
 		public IHalResource Parent { get; internal set; }
 
 
-    	public HalResource(string rel, Uri href)
-			: this(rel, href.AsString())
+        private ResourcesFinder _Resources;
+        private PropertyFinder _Properties;
+    	public HalResource(string rel, Uri href) : this(rel, href.AsString())
     	{
+            
     	}
 
 		public HalResource(string rel, string href)
 		{
     		Contents = new OrderedDictionary<string, HalNode>();
+            _Resources = new ResourcesFinder(this);
+            _Properties = new PropertyFinder(this);
 
 			Rel = rel;
 			Href = href;
@@ -40,5 +44,9 @@ namespace Hal {
                 };
 			}
 		}
+
+
+        public PropertyFinder Properties { get { return _Properties; } }
+        public ResourcesFinder Resources { get { return _Resources; }}
     }
 }

@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+	<metadata>
+		<id>Tavis.Hal</id>
+		<version>0.1.5</version>
+		<authors>Darrel Miller</authors>
+		<requireLicenseAcceptance>false</requireLicenseAcceptance>
+		<description>.Net implementation of the HAL media type</description>
+
+	 <dependencies>
+		  <dependency id="Tavis.Link" version="0.1.8" />
+	 </dependencies>
+	 
+	 
+	</metadata>
+
+	<files>
+		<file src="..\src\Hal\bin\release\Tavis.Hal.dll" target="lib\net40" />
+	</files>
+</package>

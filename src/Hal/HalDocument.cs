@@ -1,13 +1,15 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
+using System.Xml.XPath;
 
 namespace Hal {
 	public class HalDocument : HalNode, IHalResource
 	{
-		internal HalResource Root { get; set; }
+		public HalResource Root { get; internal set; }
 
 		public readonly IList<Tuple<string, Uri>> Namespaces;
 
@@ -44,6 +46,7 @@ namespace Hal {
 			: this((string)null)
 		{
 			Root = root;
+
 		}
 		
 		public HalDocument(Uri href, string rel = "self")
@@ -66,5 +69,82 @@ namespace Hal {
         public static HalDocument Parse(string hal) {
             return XElement.Parse(hal).ReadAsHalDocument();
         }
+
+	    
     }
+
+    public class ResourcesFinder {
+        private readonly HalNode _root;
+
+        public ResourcesFinder(HalNode root) {
+            _root = root;
+        }
+
+        public IEnumerable<HalResource> this[string relation] {
+            get {
+                var list = new List<HalResource>();
+                FindNodesByRelation(list,relation,_root);
+                return list;
+            }       
+	    }
+
+        private void FindNodesByRelation(List<HalResource> list, string relation, HalNode node) {
+            
+            var resource = node as HalResource;
+            if (resource != null) {
+                if (resource.ResourceLink.Rel == relation) {
+                    list.Add(resource);
+                }
+
+                foreach (var content in resource.Contents.Values)
+                {
+                    FindNodesByRelation(list, relation, content);
+                }
+            }
+
+        }
+
+    }
+
+    public class PropertyFinder
+    {
+        private readonly HalResource _root;
+
+        public PropertyFinder(HalResource root)
+        {
+            _root = root;
+        }
+
+        public string this[string propertyNameAndPath]
+        {
+            get {
+                var parts = propertyNameAndPath.Split('/');
+                var propertyName = parts[0];
+                var prop = _root.FindProperty(propertyName);
+                var xValue = prop.Value;
+                
+                if (parts.Length > 1 ) {
+                    var xPath = parts[1];
+                    
+                    var result = xValue.XPathEvaluate(xPath);
+                    if (result is string) {
+                        return (string) result;
+                    } else 
+                    if (result is double) {
+                        return ((double) result).ToString();
+                    } else {
+                        var att = (IEnumerable) result;
+                        return att.Cast<XAttribute>().FirstOrDefault().Value;
+                    }
+
+                    
+                } else {
+                    return xValue.Value;    
+                    
+                }
+                
+            }
+        }
+    }
+
 }

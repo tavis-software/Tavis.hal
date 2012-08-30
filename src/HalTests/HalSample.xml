@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resource rel="self" href="http://oak:8787/dashboard">
+  <resource rel="urn:tavis:dashboard" href="http://oak:8787/dashboard">
+    <resource rel="urn:tavis:status" href="http://localhost:8787/" name="1">
+      <IsOk>True</IsOk>
+      <ServerName IsRequired="false">Local</ServerName>
+    </resource>
+    <resource rel="urn:tavis:status" href="http://deploy.fabplex.com/" name="2">
+      <IsOk>False</IsOk>
+      <ServerName>Deployment Server</ServerName>
+    </resource>
+    <resource rel="urn:tavis:status" href="http://www.tavis.ca/" name="3">
+      <IsOk>True</IsOk>
+      <ServerName>Tavis Website</ServerName>
+    </resource>
+  </resource>
+</resource>

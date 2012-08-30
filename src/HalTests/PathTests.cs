@@ -181,5 +181,93 @@ namespace HalTests
 			Assert.AreEqual(3, nodes.Count());
 			Assert.AreEqual("Mike", (nodes.ElementAt(0) as HalProperty).Value.Value);
 		}
+
+
+        [TestMethod]
+        public void FindNodesInSample()
+        {
+            // Arrange
+            var stream = this.GetType().Assembly.GetManifestResourceStream(this.GetType(), "HalSample.xml");
+            var hal = HalDocument.Load(stream);
+
+            // Act
+            var nodes = hal.SelectNodesAt("/urn:tavis:dashboard");
+
+            //Assert
+            Assert.IsNotNull(nodes);
+            Assert.IsTrue(nodes.Any());
+            Assert.AreEqual(3, nodes.Count());
+
+        }
+
+
+        [TestMethod]
+        public void FindResourcesUsingIndexer()
+        {
+            // Arrange
+            var stream = this.GetType().Assembly.GetManifestResourceStream(this.GetType(), "HalSample.xml");
+            var hal = HalDocument.Load(stream);
+
+            // Act
+            var nodes = hal.Root.Resources["urn:tavis:status"];
+
+            //Assert
+            Assert.IsNotNull(nodes);
+            Assert.IsTrue(nodes.Any());
+            Assert.AreEqual(3, nodes.Count());
+
+        }
+
+
+        [TestMethod]
+        public void FindRootResourcesByName()
+        {
+            // Arrange
+            var stream = this.GetType().Assembly.GetManifestResourceStream(this.GetType(), "HalSample.xml");
+            var hal = HalDocument.Load(stream);
+
+            // Act
+            var nodes = hal.Root.Resources["urn:tavis:dashboard"];
+
+            //Assert
+            
+            Assert.AreEqual(1, nodes.Count());
+
+        }
+
+        [TestMethod]
+        public void GetPropertyFromResource()
+        {
+            // Arrange
+            var stream = this.GetType().Assembly.GetManifestResourceStream(this.GetType(), "HalSample.xml");
+            var hal = HalDocument.Load(stream);
+
+            var nodes = hal.Root.Resources["urn:tavis:status"];
+            // Act
+            var node = nodes.First();
+            var isOK = node.Properties["IsOk"];
+
+
+            //Assert
+            Assert.AreEqual("True", isOK);
+
+        }
+
+        [TestMethod]
+        public void GetPropertyFromResourceWithXPath()
+        {
+            // Arrange
+            var stream = this.GetType().Assembly.GetManifestResourceStream(this.GetType(), "HalSample.xml");
+            var hal = HalDocument.Load(stream);
+            var nodes = hal.Root.Resources["urn:tavis:status"];
+
+            // Act
+            var node = nodes.First();
+            var isRequired = node.Properties["ServerName/@IsRequired"];
+
+            //Assert
+            Assert.AreEqual("false", isRequired);
+
+        }
 	}
 }
