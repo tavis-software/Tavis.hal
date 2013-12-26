@@ -85,12 +85,6 @@
     <Compile Include="HalTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Hal\Hal.csproj">
-      <Project>{56270AA2-D668-49B0-8B36-087AF51EA2F5}</Project>
-      <Name>Hal</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config">
       <SubType>Designer</SubType>

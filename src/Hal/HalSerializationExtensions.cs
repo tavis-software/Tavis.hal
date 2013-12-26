@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Xml;
 using System.Xml.Linq;
 
@@ -47,7 +48,7 @@ namespace Hal
 		}
 
 
-		internal static void WriteAsXml(this HalResource halResource, XmlWriter writer, IEnumerable<Tuple<string, Uri>> namespaces = null)
+		internal static void WriteAsXml(this HalResource halResource, XmlWriter writer, IEnumerable<HalNamespace> namespaces = null)
 		{
 			writer.WriteStartElement("resource");
 			writer.WriteAttributeString("rel", halResource.Rel);
@@ -57,7 +58,7 @@ namespace Hal
  
 			if ((namespaces != null) && (namespaces.Any())) {
 				foreach (var @namespace in namespaces) {
-					writer.WriteAttributeString("xmlns", @namespace.Item1, null, @namespace.Item2.AsString());
+					writer.WriteAttributeString("xmlns", @namespace.Prefix, null, @namespace.Namespace.AsString());
 				}
 			}
 
@@ -84,7 +85,12 @@ namespace Hal
 		}
 
 
-		internal static void WriteAsXml(this HalTypedResourceContents contents, XmlWriter writer)		{			foreach (var node in contents.ContentNode.DescendantNodes()) {				node.WriteTo(writer);			}		}
+		internal static void WriteAsXml(this HalTypedResourceContents contents, XmlWriter writer)
+		{
+			foreach (var node in contents.ContentNode.DescendantNodes()) {
+				node.WriteTo(writer);
+			}
+		}
 
 
 		internal static void WriteAsXml(this HalLink halLink, XmlWriter writer)
@@ -103,82 +109,6 @@ namespace Hal
 		}
 		
 
-
-		public static HalDocument ReadAsHalDocument(this XElement element)
-		{
-			var doc = new HalDocument(element.ReadAsHalResource(null));
-
-			var namespaces = element.Attributes().Where(a => a.IsNamespaceDeclaration);
-			foreach (var attr in namespaces) {
-				doc.Namespaces.Add(new Tuple<string, Uri>(attr.Name.LocalName, new Uri(attr.Value)));
-			}
-
-			return doc;
-		}
-		
-
-		
-		internal static HalResource ReadAsHalResource(this XElement element, IHalResource parent)
-		{
-
-			var resource = new HalResource(
-				element.ReadAttribute<string>("rel"),
-				element.ReadAttribute<string>("href")
-			) {
-				Name = element.ReadAttribute<string>("name"),
-				Type = element.ReadAttribute<string>("type"),
-				Parent = parent
-			};
-
-			resource.Contents.Clear();
-			if (resource.Type == null) {
-				foreach (var node in element.Elements().Select(el => HalNodeFactory(el, resource))) {
-					resource.Contents[node.Key] = node;
-				}
-			}
-			else {
-				var node = new HalTypedResourceContents {
-					ContentNode = element
-				};
-				resource.Contents.Add(node.Key, node);
-			}
-			
-			return resource;
-		}
-
-
-		internal static HalLink ReadAsHalLink(this XElement element)
-		{
-			var link = new HalLink {
-				Href = element.ReadAttribute<string>("href"),
-				Rel = element.ReadAttribute<string>("rel")
-			};
-			return link;
-		}
-
-
-
-		private static HalNode HalNodeFactory(XElement element, IHalResource parent)
-		{
-
-			switch (element.Name.LocalName) {
-				case "link":
-					return element.ReadAsHalLink();
-				case "resource":
-					return element.ReadAsHalResource(parent);
-				default:
-					return new HalProperty {
-						Value = element
-					};
-			}
-		}
-
-
-		private static T ReadAttribute<T>(this XElement element, string name)
-		{
-			if (element.Attribute(name) == null) return default(T);
-			return (T)Convert.ChangeType(element.Attribute(name).Value, typeof(T));
-		}
 
 	}
 }

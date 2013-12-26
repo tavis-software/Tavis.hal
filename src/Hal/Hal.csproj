@@ -81,13 +81,16 @@
     <Compile Include="HalNode.cs" />
     <Compile Include="HalPath.cs" />
     <Compile Include="HalProperty.cs" />
+    <Compile Include="IHalReader.cs" />
     <Compile Include="HalResource.cs" />
     <Compile Include="HalSerializationExtensions.cs" />
     <Compile Include="HalTypedResourceContents.cs" />
     <Compile Include="IHalResource.cs" />
+    <Compile Include="Json\JsonHalReader.cs" />
     <Compile Include="OrderedDictionary.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UriExtensions.cs" />
+    <Compile Include="Xml\XmlHalReader.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config">

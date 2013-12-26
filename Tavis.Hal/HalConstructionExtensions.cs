@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text;
 using System.Xml.Linq;
-using Tavis;
 
-
-namespace Hal
+namespace Tavis
 {
 	public static class HalConstructionExtensions
 	{
@@ -55,7 +51,7 @@ namespace Hal
 
 		public static IHalResource AddXml(this IHalResource resource, XElement element)
 		{
-			return resource.AddNode(new HalProperty { Value = element });
+			return resource.AddNode(new HalXProperty { Content = element });
 		}
 
 

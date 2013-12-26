@@ -4,14 +4,26 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
-using System.Xml.XPath;
+using Tavis;
 
 namespace Hal {
+
+    public class HalNamespace
+    {
+        public HalNamespace(string prefix, Uri @namespace)
+        {
+            Prefix = prefix;
+            Namespace = @namespace;
+        }
+        public string Prefix { get; set; }
+        public Uri Namespace { get; set; }
+    }
+
 	public class HalDocument : HalNode, IHalResource
 	{
 		public HalResource Root { get; internal set; }
 
-		public readonly IList<Tuple<string, Uri>> Namespaces;
+        public readonly IList<HalNamespace> Namespaces;
 
 		public string Rel {
 			get { return Root.Rel; }
@@ -56,18 +68,18 @@ namespace Hal {
 
     	public HalDocument(string href, string rel = "self")
     	{
-    		Namespaces = new List<Tuple<string, Uri>>();
+            Namespaces = new List<HalNamespace>();
 			Root = new HalResource(rel, href);
     	}
 
 
         public static HalDocument Load(Stream stream) {
-            return XElement.Load(stream).ReadAsHalDocument();
+            return new XmlHalReader().Load(stream);// XElement.Load(stream).ReadAsHalDocument();
         }
 
 
         public static HalDocument Parse(string hal) {
-            return XElement.Parse(hal).ReadAsHalDocument();
+            return new XmlHalReader().Load(hal);
         }
 
 	    
@@ -125,8 +137,8 @@ namespace Hal {
                 
                 if (parts.Length > 1 ) {
                     var xPath = parts[1];
-                    
-                    var result = xValue.XPathEvaluate(xPath);
+
+                    var result = (object)"";  //TODO xValue.XPathEvaluate(xPath);
                     if (result is string) {
                         return (string) result;
                     } else 
