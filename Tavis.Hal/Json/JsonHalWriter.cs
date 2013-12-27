@@ -13,8 +13,9 @@ namespace Tavis
         public void CopyToStream(HalDocument document, Stream stream)
         {
             var stringBuilder = new StringBuilder();
-            using (var writer = new JsonTextWriter(new StringWriter(stringBuilder)))
+            using (var writer = new JsonTextWriter(new StringWriter(stringBuilder)) {Formatting = Formatting.Indented})
             {
+                
                 WriteDocument(document, writer);
             }
 
@@ -26,7 +27,7 @@ namespace Tavis
         public Stream ToStream(HalDocument document)
         {
             var stringBuilder = new StringBuilder();
-            using (var writer = new JsonTextWriter(new StringWriter(stringBuilder)))
+            using (var writer = new JsonTextWriter(new StringWriter(stringBuilder)) { Formatting = Formatting.Indented })
             {
                 WriteDocument(document, writer);
             }
@@ -81,24 +82,42 @@ namespace Tavis
 
             }
 
-            foreach (var halNode in halResource.Contents.Values)
+            var links = halResource.Contents.Values.Where(h => h is HalLink) .Cast<HalLink>().ToList();
+            if (links.Any())
             {
-                if (halNode is HalLink)
+                writer.WritePropertyName("_links");
+                writer.WriteStartObject();
+
+                foreach (var halLink in links)
                 {
-                    var halLink = (HalLink)halNode;
-                    WriteDocument(halLink, writer);
+                    WriteLink(halLink,writer);
                 }
-                else if (halNode is IHalProperty)
+                writer.WriteEndObject();
+
+            }
+
+            var properties = halResource.Contents.Values.Where(h => h is IHalProperty).Cast<IHalProperty>().ToList();
+            if (properties.Any())
+            {
+                foreach (var halProperty in properties)
                 {
-                    var halProperty = (IHalProperty)halNode;
-                    WriteDocument(halProperty, writer);
-                }
-                else if (halNode is HalResource)
-                {
-                    var halChildResource = (HalResource)halNode;
-                    WriteDocument(halChildResource, writer);
+                    WriteProperty(halProperty,writer);
                 }
             }
+
+            var resources = halResource.Contents.Values.Where(h => h is HalResource).Cast<HalResource>().ToList();
+            if (resources.Any())
+            {
+                writer.WritePropertyName("_embedded");
+                writer.WriteStartObject();
+                foreach (var halChildResource in resources)
+                {
+                    writer.WritePropertyName(halChildResource.Rel);
+                    WriteResource(halChildResource,writer);
+                }
+                writer.WriteEndObject();
+            }
+            
 
             writer.WriteEndObject();
         }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Tavis.IANA;
 
 
 namespace Tavis {
@@ -39,20 +40,22 @@ namespace Tavis {
 		public IHalResource Parent { get { return null; } }
 
 
-		internal HalDocument(HalResource root) : this((string)null)
+		internal HalDocument(HalResource root) : this()
 		{
 			Root = root;
 		}
 		
-		public HalDocument(Uri href, string rel = "self") : this(href.AsString(), rel)
-		{
-		}
+		
 
-    	public HalDocument(string href, string rel = "self")
-    	{
+        public HalDocument(SelfLink selfLink = null, params HalNode[] contents)
+        {
             Namespaces = new List<HalNamespace>();
-			Root = new HalResource(rel, href);
-    	}
+            Root = new HalResource("self", selfLink == null ? "":selfLink.Target.OriginalString);
+            foreach (var content in contents)
+            {
+                Root.Contents.Add(content.Key,content);
+            }
+        }
 
 
 	}

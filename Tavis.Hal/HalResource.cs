@@ -6,7 +6,7 @@ namespace Tavis {
         public string Name { get; set; }
         public string Href { get; set; }
         public string Type { get; set; }
-
+        public Link Link { get; set; }
 		public OrderedDictionary<string, HalNode> Contents { get; set; }
 
 		public IHalResource Parent { get; internal set; }
@@ -19,14 +19,21 @@ namespace Tavis {
             
     	}
 
-		public HalResource(string rel, string href)
-		{
-    		Contents = new OrderedDictionary<string, HalNode>();
+        public HalResource(Link resourceLink)
+        {
+            Contents = new OrderedDictionary<string, HalNode>();
             _Resources = new ResourcesFinder(this);
             _Properties = new PropertyFinder(this);
+            Link = resourceLink;
+            Rel = resourceLink.Relation;
+            if (resourceLink.Target != null)
+            {
+                Href = resourceLink.Target.OriginalString;
+            }
 
-			Rel = rel;
-			Href = href;
+        }
+		public HalResource(string rel, string href) : this(new Link() {Relation = rel,Target = new Uri(href,UriKind.RelativeOrAbsolute)})
+		{
 		}
 
         public override string Key {

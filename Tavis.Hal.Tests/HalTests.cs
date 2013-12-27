@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using Tavis.IANA;
 using Xunit;
 
 namespace Tavis.Hal.Tests
@@ -22,7 +24,7 @@ namespace Tavis.Hal.Tests
         [Fact]
         public void CreateHalManually()
 		{
-			var hal = new HalDocument("http://example.org");
+            var hal = new HalDocument(new SelfLink() { Target = new Uri("http://example.org") });
 			hal.Contents.Add("foo", new HalResource(
 				"foo",
 				"http://example.org/foo"
@@ -39,7 +41,7 @@ namespace Tavis.Hal.Tests
 		[Fact]
 		public void CreateHalManually2()
 		{
-			var hal = new HalDocument("http://example.org");
+            var hal = new HalDocument(new SelfLink() { Target = new Uri("http://example.org") });
 			hal.Contents.Add("foo", new HalResource(
 				"foo",
 				"http://example.org/foo"
@@ -55,7 +57,7 @@ namespace Tavis.Hal.Tests
 
         [Fact]
         public void CreateHalManuallyUsingBuilder() {
-            var hal = new HalDocument("http://example.org");
+            var hal = new HalDocument(new SelfLink() { Target = new Uri("http://example.org") });
 
 
             hal.CreateResource("foo", "http://example.org/foo").End()
@@ -70,26 +72,26 @@ namespace Tavis.Hal.Tests
 
         [Fact]
         public void CreateSampleHalFromSpec() {
-            var hal = new HalDocument("http://example.org");
+            var hal = new HalDocument(new SelfLink() { Target = new Uri("http://example.org") });
             hal.AddNamespace("td", new Uri("http://mytodoapp.com/rels/"));
 
             hal.AddLink("td:search", "/todo-list/search;{searchterm}");
             hal.AddLink("td:description", "/todo-list/description");
-            hal.AddProperty("created_at", "2010-01-16");
-            hal.AddProperty("updated_at", "2010-02-21");
-            hal.AddProperty("summary", "An example list");
+            hal.AddXProperty("created_at", "2010-01-16");
+            hal.AddXProperty("updated_at", "2010-02-21");
+            hal.AddXProperty("summary", "An example list");
 
             hal.CreateResource("td:owner", "http://range14sux.com/mike")
-                    .AddProperty("name","Mike")
-                    .AddProperty("age","36")
+                    .AddXProperty("name","Mike")
+                    .AddXProperty("age","36")
                     .AddLink("td:friend", "http://mamund.com/")
                 .End();
 
             hal.CreateResource("td:item", "http://home.com/tasks/126")
-                .AddProperty("title", "Find Mug")
-                .AddProperty("details", "Find my mug.")
+                .AddXProperty("title", "Find Mug")
+                .AddXProperty("details", "Find my mug.")
 
-                .AddTypedResource("td:attachment", "text/plain", @"
+                .AddTypedResource(new Link() {Relation  = "td:attachment", Type = new MediaTypeWithQualityHeaderValue("text/plain")}, @"
             **********************************
                 PLACES MY MUG COULD BE
             **********************************
@@ -102,8 +104,7 @@ namespace Tavis.Hal.Tests
             .End();
 
             hal.CreateResource("td:item", "http://work.com/todos/make-some-tea")
-                .AddProperty("title", "Make tea")
-                .AddProperty("details", "Mike nice tea that is green. (Gyokuro)")
+                .AddXProperty("title", "Make tea").AddXProperty("details", "Mike nice tea that is green. (Gyokuro)")
                 .AddLink("td:prev", "http://home.com/tasks/126")
             .End();
 

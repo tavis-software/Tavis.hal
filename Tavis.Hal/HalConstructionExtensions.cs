@@ -2,66 +2,65 @@
 using System.Globalization;
 using System.Linq;
 using System.Xml.Linq;
+using Newtonsoft.Json.Linq;
 
 namespace Tavis
 {
-	public static class HalConstructionExtensions
-	{
-		public static HalDocument AddNamespace(this HalDocument document, string name, string uri)
-		{
-			return AddNamespace(document, name, uri.AsUri());
-		}
-		public static HalDocument AddNamespace(this HalDocument document, string name, Uri uri)
-		{
-			if (name == null) throw new ArgumentNullException("name");
-			if (uri == null) throw new ArgumentNullException("uri");
+    public static class HalConstructionExtensions
+    {
+        public static HalDocument AddNamespace(this HalDocument document, string name, string uri)
+        {
+            return AddNamespace(document, name, uri.AsUri());
+        }
 
-			document.Namespaces.Add(new HalNamespace(name, uri));
-			return document;
-		}
+        public static HalDocument AddNamespace(this HalDocument document, string name, Uri uri)
+        {
+            if (name == null) throw new ArgumentNullException("name");
+            if (uri == null) throw new ArgumentNullException("uri");
 
+            document.Namespaces.Add(new HalNamespace(name, uri));
+            return document;
+        }
+
+        
+        public static IHalResource AddLink(this IHalResource resource, string rel, string href)
+        {
+            return resource.AddLink(new Link() {Relation = rel, Target = href.AsUri()});
+        }
 
         public static IHalResource AddLink(this IHalResource resource, Link link)
         {
-            return AddLink(resource, link.Relation, link.Target);
+            var hallink = new HalLink(link);
+
+            return resource.AddNode(hallink);
         }
-		
-		public static IHalResource AddLink(this IHalResource resource, string rel, string href)
+
+
+        public static IHalResource AddJProperty(this IHalResource resource, string name, object value)
+        {
+            var jProperty = new JProperty(name, value);
+
+
+            return resource.AddNode(new HalJProperty { Content = jProperty });
+
+        }
+        public static IHalResource AddXProperty(this IHalResource resource, string name, string value)
+        {
+            var element = new XElement(name, value);
+
+            return resource.AddNode(new HalXProperty {Content = element});
+        }
+
+
+        public static IHalResource CreateResource(this IHalResource resource, string relation, string href , string name = null)
+        {
+            return resource.CreateResource(new Link() {Relation = relation, Target = new Uri(href, UriKind.RelativeOrAbsolute)});
+        }
+
+    public static IHalResource CreateResource(this IHalResource resource, Link resourceLink, string name = null)
 		{
-			return AddLink(resource, rel, href.AsUri());
-		}
-		public static IHalResource AddLink(this IHalResource resource, string rel, Uri href)
-		{
-			var link = new HalLink {
-				Rel = rel,
-				Href = href.AsString()
-			};
-
-			return resource.AddNode(link);
-		}
-
-
-		public static IHalResource AddProperty(this IHalResource resource, string name, string value)
-		{
-			var element = new XElement(name, value);
-
-			return resource.AddXml(element);
-		}
-
-
-		public static IHalResource AddXml(this IHalResource resource, XElement element)
-		{
-			return resource.AddNode(new HalXProperty { Content = element });
-		}
-
-
-		public static IHalResource CreateResource(this IHalResource resource, string rel, string href, string name = null)
-		{
-			return CreateResource(resource, rel, href.AsUri(), name);
-		}
-		public static IHalResource CreateResource(this IHalResource resource, string rel, Uri href = null, string name = null)
-		{
-			var newResource = new HalResource(rel, href) {
+            var newResource = new HalResource(resourceLink)
+            {
 				Name = name,
 				Parent = resource
 			};
@@ -77,26 +76,10 @@ namespace Tavis
 		}
 
 
-		public static IHalResource AddTypedResource(this IHalResource resource, string rel, string type, string contents, string href, string name = null)
+		public static IHalResource AddTypedResource(this IHalResource resource, Link resourceLink, object contents, string name = null)
 		{
-			return AddTypedResource(resource, rel, type, (object)contents, href.AsUri(), name);
-		}
-		public static IHalResource AddTypedResource(this IHalResource resource, string rel, string type, string contents, Uri href = null, string name = null)
-		{
-			return AddTypedResource(resource, rel, type, (object)contents, href, name);
-		}
-		public static IHalResource AddTypedResource(this IHalResource resource, string rel, string type, XElement contents, string href, string name = null)
-		{
-			return AddTypedResource(resource, rel, type, (object)contents, href.AsUri(), name);
-		}
-		public static IHalResource AddTypedResource(this IHalResource resource, string rel, string type, XElement contents, Uri href = null, string name = null)
-		{
-			return AddTypedResource(resource, rel, type, (object)contents, href, name);
-		}
-		internal static IHalResource AddTypedResource(this IHalResource resource, string rel, string type, object contents, Uri href = null, string name = null)
-		{
-			var newResource = resource.CreateResource(rel, href, name);
-			newResource.Type = type;
+			var newResource = resource.CreateResource(resourceLink, name);
+			newResource.Type = resourceLink.Type.MediaType;
 
 			var resourceContents = new HalTypedResourceContents {
 				ContentNode = contents is XElement ? (XElement)contents : new XElement("TypedResourceContentsWrapper", contents)
