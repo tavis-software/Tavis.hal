@@ -17,11 +17,11 @@ namespace Tavis.Hal.Tests
         public void CreateHalManually()
         {
             var hal = new HalDocument(new SelfLink() { Target = new Uri("http://example.org") });
-            hal.Contents.Add("foo", new HalResource(
+            hal.Root.Contents.Add("foo", new HalResource(
                 "foo",
                 "http://example.org/foo"
             ));
-            hal.Contents.Add("bar", new HalLink()
+            hal.Root.Contents.Add("bar", new HalLink()
             {
                 Rel = "bar",
                 Href = "http://example.org/bar"
@@ -56,9 +56,11 @@ namespace Tavis.Hal.Tests
         [Fact]
         public void CreateSampleHalFromSpec()
         {
-            var hal = new HalDocument(new SelfLink() { Target = new Uri("http://example.org") });
-            hal.AddNamespace("td", new Uri("http://mytodoapp.com/rels/"));
+            var haldoc = new HalDocument(new SelfLink() { Target = new Uri("http://example.org") });
+            haldoc.AddNamespace("td", new Uri("http://mytodoapp.com/rels/"));
 
+            var hal = haldoc.Root;
+            
             hal.AddLink("td:search", "/todo-list/search;{searchterm}");
             hal.AddLink("td:description", "/todo-list/description");
             hal.AddJProperty("created_at", "2010-01-16");
@@ -86,7 +88,7 @@ namespace Tavis.Hal.Tests
             .End();
 
 
-            var stringHal = new StreamReader(new JsonHalWriter().ToStream(hal)).ReadToEnd();
+            var stringHal = new StreamReader(new JsonHalWriter().ToStream(haldoc)).ReadToEnd();
             Assert.NotNull(hal);
             Assert.NotNull(stringHal);
         }

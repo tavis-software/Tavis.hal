@@ -63,7 +63,7 @@ namespace Tavis
 			var halNode = currentNode;
 			if (halNode is HalLink) return (HalLink)halNode;
 			if (halNode is HalResource) {
-				var halLink = ((HalResource)halNode).ResourceLink;
+				var halLink = new HalLink(((HalResource)halNode).Link); 
 				//halLink.Name = halPath.Segments.Last().Name;
 				return halLink;
 			}
@@ -100,7 +100,7 @@ namespace Tavis
 
 		private static void InternalFindAllLinks(HalResource resource, IList<HalLink> outList)
 		{
-			outList.Add(resource.ResourceLink);
+			outList.Add(new HalLink(resource.Link));
 
 			foreach (var node in resource.Contents.Values.OfType<HalLink>()) {
 				outList.Add(node);

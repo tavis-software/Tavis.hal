@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using Tavis.IANA;
 
 namespace Tavis
 {
@@ -7,7 +8,7 @@ namespace Tavis
   
         public HalDocument Load(Stream xmlStream)
         {
-         return  new HalDocument(new HalResource("",""));
+         return  new HalDocument(new HalResource(new SelfLink()));
         }
     }
 }

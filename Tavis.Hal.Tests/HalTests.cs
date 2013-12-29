@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using Tavis.IANA;
+using Tavis.UriTemplates;
 using Xunit;
 
 namespace Tavis.Hal.Tests
@@ -25,11 +27,12 @@ namespace Tavis.Hal.Tests
         public void CreateHalManually()
 		{
             var hal = new HalDocument(new SelfLink() { Target = new Uri("http://example.org") });
-			hal.Contents.Add("foo", new HalResource(
+			hal.Root.Contents.Add("foo", new HalResource(
 				"foo",
 				"http://example.org/foo"
 			));
-			hal.Contents.Add("bar", new HalLink() {
+            hal.Root.Contents.Add("bar", new HalLink()
+            {
 				Rel = "bar",
 				Href = "http://example.org/bar"
 			});
@@ -42,11 +45,12 @@ namespace Tavis.Hal.Tests
 		public void CreateHalManually2()
 		{
             var hal = new HalDocument(new SelfLink() { Target = new Uri("http://example.org") });
-			hal.Contents.Add("foo", new HalResource(
+            hal.Root.Contents.Add("foo", new HalResource(
 				"foo",
 				"http://example.org/foo"
 			));
-			hal.Contents.Add("bar", new HalLink {
+            hal.Root.Contents.Add("bar", new HalLink
+            {
 				Rel = "bar",
 				Href = "http://example.org/bar"
 			});
@@ -60,7 +64,7 @@ namespace Tavis.Hal.Tests
             var hal = new HalDocument(new SelfLink() { Target = new Uri("http://example.org") });
 
 
-            hal.CreateResource("foo", "http://example.org/foo").End()
+            hal.Root.CreateResource("foo", "http://example.org/foo").End()
                 .CreateResource("bar", "http://example.org/bar").End();
             
 
@@ -72,8 +76,9 @@ namespace Tavis.Hal.Tests
 
         [Fact]
         public void CreateSampleHalFromSpec() {
-            var hal = new HalDocument(new SelfLink() { Target = new Uri("http://example.org") });
-            hal.AddNamespace("td", new Uri("http://mytodoapp.com/rels/"));
+            var haldoc = new HalDocument(new SelfLink() { Target = new Uri("http://example.org") });
+            haldoc.AddNamespace("td", new Uri("http://mytodoapp.com/rels/"));
+            var hal = haldoc.Root;
 
             hal.AddLink("td:search", "/todo-list/search;{searchterm}");
             hal.AddLink("td:description", "/todo-list/description");
@@ -109,7 +114,7 @@ namespace Tavis.Hal.Tests
             .End();
 
 
-            var stringHal = new StreamReader(new XmlHalWriter().ToStream(hal)).ReadToEnd();
+            var stringHal = new StreamReader(new XmlHalWriter().ToStream(haldoc)).ReadToEnd();
             Assert.NotNull(hal);
             Assert.NotNull(stringHal);
         }
@@ -143,7 +148,20 @@ namespace Tavis.Hal.Tests
 		}
 
 
-        
+        [Fact]
+        public void ReservedCharacterExpansion()
+        {
+            var link = new Link();
+            link.Target = new Uri("http://foo.com/{?format}");
+
+            link.SetParameter("format", "application/vnd.foo+xml");
+
+            var result = link.CreateRequest();
+
+
+            Assert.Equal("http://foo.com/?format=application%2Fvnd.foo%2Bxml", result.RequestUri.OriginalString);
+           
+        }
 
 
 		public static string GetContent()

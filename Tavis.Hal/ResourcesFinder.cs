@@ -21,7 +21,7 @@ namespace Tavis
             
             var resource = node as HalResource;
             if (resource != null) {
-                if (resource.ResourceLink.Rel == relation) {
+                if (resource.Link.Relation == relation) {
                     list.Add(resource);
                 }
 

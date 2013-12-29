@@ -109,7 +109,7 @@ namespace Tavis.Hal.Tests
             Exception expected = null;
 			// Act
 			try {
-				hal.FindNode("");
+				hal.Root.FindNode("");
 			}
 			catch (HalPathException e)
 			{
@@ -128,7 +128,7 @@ namespace Tavis.Hal.Tests
             var hal = new XmlHalReader().Load(content);
 
 			// Act
-			var node = hal.FindNode("/");
+			var node = hal.Root.FindNode("/");
 
 			//Assert
 			Assert.NotNull(node);
@@ -143,7 +143,7 @@ namespace Tavis.Hal.Tests
             var hal = new XmlHalReader().Load(content);
 
 			// Act
-			var node = hal.FindNode("/item[2]/title") as IHalProperty;
+			var node = hal.Root.FindNode("/item[2]/title") as IHalProperty;
 
 			//Assert
 			Assert.NotNull(node);
@@ -157,7 +157,7 @@ namespace Tavis.Hal.Tests
             var hal = new XmlHalReader().Load(content);
 
             // Act
-            var value = hal.FindProperty("/item[2]/title") as IHalProperty;
+            var value = hal.Root.FindProperty("/item[2]/title") as IHalProperty;
 
             //Assert
             
@@ -171,7 +171,7 @@ namespace Tavis.Hal.Tests
             var hal = new XmlHalReader().Load(content);
 
 			// Act
-			var nodes = hal.SelectNodesAt("/owner");
+            var nodes = hal.Root.SelectNodesAt("/owner");
 
 			//Assert
 			Assert.NotNull(nodes);
@@ -189,7 +189,7 @@ namespace Tavis.Hal.Tests
             var hal = new XmlHalReader().Load(stream);
 
             // Act
-            var nodes = hal.SelectNodesAt("/urn:tavis:dashboard");
+            var nodes = hal.Root.SelectNodesAt("/urn:tavis:dashboard");
 
             //Assert
             Assert.NotNull(nodes);
