@@ -1,4 +1,5 @@
 using System.Collections;
+using System.ComponentModel;
 using System.Linq;
 using System.Xml.Linq;
 
@@ -7,12 +8,18 @@ using Newtonsoft.Json.Linq;
 namespace Tavis {
 
     public class HalXProperty : HalNode, IHalProperty {
+
         public XElement Content { get; set; }
 
-		public override string Key {
+		public override string Key 
+        {
 			get { return Content.Name.LocalName; }
 		}
 
+        public string Name
+        {
+            get { return Content.Name.LocalName; }
+        }
 
         public object GetContent()
         {
@@ -55,7 +62,7 @@ namespace Tavis {
     {
         public JProperty Content { get; set; }
 
-
+        public string Name { get { return Content.Name; } }
 
         public override string Key
         {
@@ -73,11 +80,31 @@ namespace Tavis {
         }
     }
 
-
-
-    public interface IHalProperty
+    public class HalProperty : HalNode, IHalProperty
     {
-        object GetContent();
-        object GetValue(string path = null);
+        private readonly string _name;
+        private readonly string _value;
+
+        public HalProperty(string name, string value)
+        {
+            _name = name;
+            _value = value;
+        }
+
+        public string Name { get { return _name; } }
+
+        public override string Key
+        {
+            get { return _name; }
+        }
+        public object GetContent()
+        {
+            return _value;
+        }
+
+        public object GetValue(string path = null)
+        {
+            return _value;
+        }
     }
 }

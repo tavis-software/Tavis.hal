@@ -16,49 +16,42 @@ namespace Tavis
             _linkFactory = linkFactory ?? new LinkFactory();
         }
 
-        public HalDocument Load(Stream xmlStream)
+        public HalResource Load(Stream xmlStream)
         {
             var root = XElement.Load(xmlStream);
-            return ReadAsHalDocument(root);
+            return ReadAsHalResource(root,null);
         }
 
-        public HalDocument Load(String xmlhalstring)
+        public HalResource Load(String xmlhalstring)
         {
             var root = XElement.Parse(xmlhalstring);
-            return ReadAsHalDocument(root);
+            return ReadAsHalResource(root,null);
         }
 
 
-        public HalDocument ReadAsHalDocument(XElement element)
+      
+
+        internal HalResource ReadAsHalResource(XElement element, HalResource parent)
         {
-            var doc = new HalDocument(ReadAsHalResource(element,null));
-
-            var namespaces = element.Attributes().Where(a => a.IsNamespaceDeclaration);
-            foreach (var attr in namespaces)
-            {
-                doc.Namespaces.Add(new HalNamespace(attr.Name.LocalName, new Uri(attr.Value)));
-            }
-
-            return doc;
-        }
-
-
-
-        internal HalResource ReadAsHalResource(XElement element, IHalResource parent)
-        {
-
+            
             var resource = new HalResource(ReadAsLink(element))
             {
                 Name = ReadAttribute<string>(element,"name"),
                 Parent = parent
             };
 
-            resource.Contents.Clear();
+            var namespaces = element.Attributes().Where(a => a.IsNamespaceDeclaration);
+            foreach (var attr in namespaces)
+            {
+                resource.Namespaces.Add(new HalNamespace(attr.Name.LocalName, new Uri(attr.Value)));
+            }
+
+            
             if (resource.Link.Type == null)
             {
                 foreach (var node in element.Elements().Select(el => HalNodeFactory(el, resource)))
                 {
-                    resource.Contents[node.Key] = node;
+                    resource.AddNode(node);
                 }
             }
             else
@@ -67,7 +60,7 @@ namespace Tavis
                 {
                     ContentNode = element
                 };
-                resource.Contents.Add(node.Key, node);
+                resource.AddNode(node);
             }
 
             return resource;
@@ -94,7 +87,7 @@ namespace Tavis
         }
 
 
-        private HalNode HalNodeFactory(XElement element, IHalResource parent)
+        private HalNode HalNodeFactory(XElement element, HalResource parent)
         {
 
             switch (element.Name.LocalName)

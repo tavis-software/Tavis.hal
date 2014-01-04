@@ -2,7 +2,7 @@
 
 namespace Tavis
 {
-    public class HalNamespace
+    internal class HalNamespace
     {
         public HalNamespace(string prefix, Uri @namespace)
         {

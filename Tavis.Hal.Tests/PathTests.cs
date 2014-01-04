@@ -19,7 +19,7 @@ namespace Tavis.Hal.Tests
 
 			//Assert
 			Assert.NotNull(link);
-			Assert.Equal("search", link.Rel);
+			Assert.Equal("search", link.Relation);
 
 		}
         [Fact]
@@ -34,7 +34,7 @@ namespace Tavis.Hal.Tests
 
 			//Assert
 			Assert.NotNull(link);
-			Assert.Equal("owner", link.Rel);
+			Assert.Equal("owner", link.Relation);
 		}
 
         [Fact]
@@ -65,7 +65,7 @@ namespace Tavis.Hal.Tests
 
 			//Assert
 			Assert.NotNull(link);
-			Assert.Equal("item", link.Rel);
+			Assert.Equal("item", link.Relation);
 
 		}
         [Fact]
@@ -80,7 +80,7 @@ namespace Tavis.Hal.Tests
 
 			//Assert
 			Assert.NotNull(link);
-			Assert.Equal("friend", link.Rel);
+			Assert.Equal("friend", link.Relation);
 		}
 
         [Fact]
@@ -95,7 +95,7 @@ namespace Tavis.Hal.Tests
 
 			//Assert
 			Assert.NotNull(link);
-            Assert.Equal("urn:tavis:prev", link.Rel);
+            Assert.Equal("urn:tavis:prev", link.Relation);
 		}
 
 
@@ -109,7 +109,7 @@ namespace Tavis.Hal.Tests
             Exception expected = null;
 			// Act
 			try {
-				hal.Root.FindNode("");
+				hal.FindNode("");
 			}
 			catch (HalPathException e)
 			{
@@ -128,7 +128,7 @@ namespace Tavis.Hal.Tests
             var hal = new XmlHalReader().Load(content);
 
 			// Act
-			var node = hal.Root.FindNode("/");
+			var node = hal.FindNode("/");
 
 			//Assert
 			Assert.NotNull(node);
@@ -143,7 +143,7 @@ namespace Tavis.Hal.Tests
             var hal = new XmlHalReader().Load(content);
 
 			// Act
-			var node = hal.Root.FindNode("/item[2]/title") as IHalProperty;
+			var node = hal.FindNode("/item[2]/title") as IHalProperty;
 
 			//Assert
 			Assert.NotNull(node);
@@ -157,7 +157,7 @@ namespace Tavis.Hal.Tests
             var hal = new XmlHalReader().Load(content);
 
             // Act
-            var value = hal.Root.FindProperty("/item[2]/title") as IHalProperty;
+            var value = hal.FindProperty("/item[2]/title") as IHalProperty;
 
             //Assert
             
@@ -171,7 +171,7 @@ namespace Tavis.Hal.Tests
             var hal = new XmlHalReader().Load(content);
 
 			// Act
-            var nodes = hal.Root.SelectNodesAt("/owner");
+            var nodes = hal.SelectNodesAt("/owner");
 
 			//Assert
 			Assert.NotNull(nodes);
@@ -189,7 +189,7 @@ namespace Tavis.Hal.Tests
             var hal = new XmlHalReader().Load(stream);
 
             // Act
-            var nodes = hal.Root.SelectNodesAt("/urn:tavis:dashboard");
+            var nodes = hal.SelectNodesAt("/urn:tavis:dashboard");
 
             //Assert
             Assert.NotNull(nodes);
@@ -207,7 +207,7 @@ namespace Tavis.Hal.Tests
             var hal = new XmlHalReader().Load(stream);
 
             // Act
-            var nodes = hal.Root.Resources["urn:tavis:status"];
+            var nodes = hal.FindResources("urn:tavis:status");
 
             //Assert
             Assert.NotNull(nodes);
@@ -225,7 +225,7 @@ namespace Tavis.Hal.Tests
             var hal = new XmlHalReader().Load(stream);
 
             // Act
-            var nodes = hal.Root.Resources["urn:tavis:dashboard"];
+            var nodes = hal.FindResources("urn:tavis:dashboard");
 
             //Assert
             
@@ -240,10 +240,10 @@ namespace Tavis.Hal.Tests
             var stream = this.GetType().Assembly.GetManifestResourceStream(this.GetType(), "HalSample.xml");
             var hal = new XmlHalReader().Load(stream);
 
-            var nodes = hal.Root.Resources["urn:tavis:status"];
+            var nodes = hal.FindResources("urn:tavis:status");
             // Act
             var node = nodes.First();
-            var isOK = node.Properties["IsOk"];
+            var isOK = node.FindProperty("IsOk").GetValue();
 
 
             //Assert
@@ -257,11 +257,11 @@ namespace Tavis.Hal.Tests
             // Arrange
             var stream = this.GetType().Assembly.GetManifestResourceStream(this.GetType(), "HalSample.xml");
             var hal = new XmlHalReader().Load(stream);
-            var nodes = hal.Root.Resources["urn:tavis:status"];
+            var nodes = hal.FindResources("urn:tavis:status");
 
             // Act
             var node = nodes.First();
-            var isRequired = node.Properties["ServerName/@IsRequired"];
+            var isRequired = node.FindProperty("ServerName/@IsRequired").GetValue();
 
             //Assert
             Assert.Equal("false", isRequired);

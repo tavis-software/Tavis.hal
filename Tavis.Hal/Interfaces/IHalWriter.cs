@@ -8,7 +8,7 @@ namespace Tavis
 {
     public interface IHalWriter
     {
-        void CopyToStream(HalDocument document, Stream stream);
-        Stream ToStream(HalDocument document);
+        void CopyToStream(HalResource resource, Stream stream);
+        Stream ToStream(HalResource resource);
     }
 }

@@ -8,6 +8,6 @@ namespace Tavis
 {
     public interface IHalReader
     {
-        HalDocument Load(Stream xmlStream);
+        HalResource Load(Stream xmlStream);
     }
 }

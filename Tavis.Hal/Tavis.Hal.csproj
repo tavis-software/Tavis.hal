@@ -35,27 +35,21 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="HalConstructionExtensions.cs" />
-    <Compile Include="HalDocument.cs" />
-    <Compile Include="HalLink.cs" />
-    <Compile Include="HalLinkExtractor.cs" />
-    <Compile Include="HalNamespace.cs" />
-    <Compile Include="HalNode.cs" />
-    <Compile Include="HalPath.cs" />
-    <Compile Include="HalPathExtensions.cs" />
-    <Compile Include="HalProperty.cs" />
-    <Compile Include="HalResource.cs" />
-    <Compile Include="HalTypedResourceContents.cs" />
-    <Compile Include="IHalReader.cs" />
-    <Compile Include="IHalResource.cs" />
-    <Compile Include="IHalWriter.cs" />
+    <Compile Include="Core\HalLink.cs" />
+    <Compile Include="Core\HalNamespace.cs" />
+    <Compile Include="Core\HalNode.cs" />
+    <Compile Include="Path\HalPath.cs" />
+    <Compile Include="Path\HalPathException.cs" />
+    <Compile Include="Path\HalPathExtensions.cs" />
+    <Compile Include="Core\HalProperty.cs" />
+    <Compile Include="Core\HalResource.cs" />
+    <Compile Include="Core\HalTypedResourceContents.cs" />
+    <Compile Include="Interfaces\IHalProperty.cs" />
+    <Compile Include="Interfaces\IHalReader.cs" />
+    <Compile Include="Interfaces\IHalWriter.cs" />
     <Compile Include="Json\JsonHalReader.cs" />
     <Compile Include="Json\JsonHalWriter.cs" />
-    <Compile Include="OrderedDictionary.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="PropertyFinder.cs" />
-    <Compile Include="ResourcesFinder.cs" />
-    <Compile Include="UriExtensions.cs" />
     <Compile Include="Xml\XmlHalReader.cs" />
     <Compile Include="Xml\XmlHalWriter.cs" />
   </ItemGroup>
@@ -91,6 +85,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <Import Project="..\packages\Microsoft.Bcl.Build.1.0.13\tools\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.13\tools\Microsoft.Bcl.Build.targets')" />

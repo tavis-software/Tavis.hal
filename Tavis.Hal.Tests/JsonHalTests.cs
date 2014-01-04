@@ -16,17 +16,14 @@ namespace Tavis.Hal.Tests
         [Fact]
         public void CreateHalManually()
         {
-            var hal = new HalDocument(new SelfLink() { Target = new Uri("http://example.org") });
-            hal.Root.Contents.Add("foo", new HalResource(
-                "foo",
-                "http://example.org/foo"
-            ));
-            hal.Root.Contents.Add("bar", new HalLink()
-            {
-                Rel = "bar",
-                Href = "http://example.org/bar"
-            });
-
+            var hal = new HalResource(new SelfLink() { Target = new Uri("http://example.org") },
+                new HalResource(new Link() {Relation="foo", Target=new Uri("http://example.org/foo")}),
+                new Link()
+                {
+                    Relation = "bar",
+                    Target = new Uri("http://example.org/bar")
+                }
+                );
 
             var jsonhalWriter = new JsonHalWriter();
             var stream = jsonhalWriter.ToStream(hal);
@@ -39,9 +36,9 @@ namespace Tavis.Hal.Tests
         [Fact]
         public void CreateHalUsingConstructor()
         {
-            var hal = new HalDocument(new SelfLink(){ Target = new Uri("http://example.org")},
+            var hal = new HalResource(new SelfLink() { Target = new Uri("http://example.org") },
                 new HalResource(new Link() { Relation = "foo", Target = new Uri("http://example.org/foo") }),
-                new HalLink(new AboutLink(){Target = new Uri("http://example.org/bar")})
+                new AboutLink(){Target = new Uri("http://example.org/bar")}
             );
            
 
@@ -56,39 +53,53 @@ namespace Tavis.Hal.Tests
         [Fact]
         public void CreateSampleHalFromSpec()
         {
-            var haldoc = new HalDocument(new SelfLink() { Target = new Uri("http://example.org") });
-            haldoc.AddNamespace("td", new Uri("http://mytodoapp.com/rels/"));
+          
 
-            var hal = haldoc.Root;
-            
-            hal.AddLink("td:search", "/todo-list/search;{searchterm}");
-            hal.AddLink("td:description", "/todo-list/description");
-            hal.AddJProperty("created_at", "2010-01-16");
-            hal.AddJProperty("updated_at", "2010-02-21");
-            hal.AddJProperty("summary", "An example list");
-
-            hal.CreateResource("td:owner", "http://range14sux.com/mike")
-                    .AddJProperty("name", "Mike")
-                    .AddJProperty("age", "36")
-                    .AddLink("td:friend", "http://mamund.com/")
-                .End();
-
-            hal.CreateResource("td:item", "http://home.com/tasks/126")
-                .AddJProperty("title", "Find Mug")
-                .AddJProperty("details", "Find my mug.")
-
-                
-                .AddLink("td:next", "http://work.com/todos/make-some-tea")
-            .End();
-
-            hal.CreateResource("td:item", "http://work.com/todos/make-some-tea")
-                .AddJProperty("title", "Make tea")
-                .AddJProperty("details", "Mike nice tea that is green. (Gyokuro)")
-                .AddLink("td:prev", "http://home.com/tasks/126")
-            .End();
+            var ownerResource = new HalResource(new Link() { Relation = "td:owner", Target = new Uri("http://range14sux.com/mike") }, new object[]
+            {
+                new HalProperty("name", "Mike"),
+                new HalProperty("age", "36"),
+                new Link() {Relation = "td:friend", Target = new Uri("http://mamund.com/")},
+            });
 
 
-            var stringHal = new StreamReader(new JsonHalWriter().ToStream(haldoc)).ReadToEnd();
+
+            var item1Resource =
+                new HalResource(new Link() {Relation = "td:item", Target = new Uri("http://home.com/tasks/126")},
+                    new object[]
+                    {
+                        new HalProperty("title", "Find Mug"),
+                        new HalProperty("details", "Find my mug."),
+                    });
+
+
+
+            var item2Resource =
+                new HalResource(
+                    new Link() {Relation = "td:item", Target = new Uri("http://work.com/todos/make-some-tea")},
+                    new object[]
+                    {
+                         new HalProperty("title", "Make tea"),
+                          new HalProperty("details", "Mike nice tea that is green. (Gyokuro)"),
+                          new Link() {Relation = "td:prev", Target = new Uri("http://home.com/tasks/126")}
+                    });
+
+            var hal = new HalResource(new SelfLink() { Target = new Uri("http://example.org") }, new object[]
+            {
+                new Link() {Relation = "td:search", Target = new Uri("/todo-list/search;{searchterm}", UriKind.Relative)},
+                new Link() {Relation = "td:description", Target = new Uri("/todo-list/description",UriKind.Relative)},
+                new HalProperty("created_at", "2010-01-16"),
+                new HalProperty("updated_at", "2010-02-21"),
+                new HalProperty("summary", "An example list"),
+                ownerResource,
+                item1Resource,
+                item2Resource
+            });
+
+            hal.AddNamespace("td", new Uri("http://mytodoapp.com/rels/"));
+
+
+            var stringHal = new StreamReader(new JsonHalWriter().ToStream(hal)).ReadToEnd();
             Assert.NotNull(hal);
             Assert.NotNull(stringHal);
         }

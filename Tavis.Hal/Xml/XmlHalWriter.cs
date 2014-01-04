@@ -11,15 +11,15 @@ namespace Tavis {
     public class XmlHalWriter : IHalWriter
     {
 
-        public void CopyToStream(HalDocument document, Stream stream)
+        public void CopyToStream(HalResource document, Stream stream)
         {
-            using (var writer = XmlWriter.Create(stream))
+            using (var writer = XmlWriter.Create(stream,new XmlWriterSettings(){Indent = true}))
             {
                 WriteAsXml(document, writer);
             }
         }
 
-        public Stream ToStream(HalDocument document)
+        public Stream ToStream(HalResource document)
         {
             var stream = new MemoryStream();
 
@@ -35,30 +35,28 @@ namespace Tavis {
 
         
 
-        public static void WriteAsXml(HalDocument halDocument, XmlWriter writer)
-        {
-            writer.WriteStartDocument();
-            WriteAsXml(halDocument.Root, writer, halDocument.Namespaces);
-            writer.WriteEndDocument();
-        }
+        
 
-        internal static void WriteAsXml(HalResource halResource, XmlWriter writer, IEnumerable<HalNamespace> namespaces = null)
+        internal static void WriteAsXml(HalResource halResource, XmlWriter writer)
         {
             writer.WriteStartElement("resource");
-            writer.WriteAttributeString("rel", halResource.Rel);
-            if (halResource.Href != null) writer.WriteAttributeString("href", halResource.Href);
-            if (!string.IsNullOrEmpty(halResource.Name)) writer.WriteAttributeString("name", halResource.Name);
-            if (!string.IsNullOrEmpty(halResource.Type)) writer.WriteAttributeString("type", halResource.Type);
+            writer.WriteAttributeString("rel", halResource.Link.Relation);
 
+            if (halResource.Link.Target != null) writer.WriteAttributeString("href", halResource.Link.Target.OriginalString);
+            if (halResource.Link.Type != null) writer.WriteAttributeString("type", halResource.Link.Type.ToString());
+
+            if (!string.IsNullOrEmpty(halResource.Name)) writer.WriteAttributeString("name", halResource.Name);
+
+            var namespaces = halResource.Namespaces;
             if ((namespaces != null) && (namespaces.Any()))
             {
                 foreach (var @namespace in namespaces)
                 {
-                    writer.WriteAttributeString("xmlns", @namespace.Prefix, null, @namespace.Namespace.AsString());
+                    writer.WriteAttributeString("xmlns", @namespace.Prefix, null, @namespace.Namespace.OriginalString);
                 }
             }
 
-            foreach (var halNode in halResource.Contents.Values)
+            foreach (var halNode in halResource.Contents)
             {
                 if (halNode is HalLink)
                 {
@@ -106,11 +104,9 @@ namespace Tavis {
 
         internal static void WriteAsXml(IHalProperty halProperty, XmlWriter writer)
         {
-            var content = halProperty.GetContent() as XElement;
-            if (content != null)
-            {
-              content.WriteTo(writer);    
-            }
+            var property = new XElement(halProperty.Name);
+            property.Value = halProperty.GetValue() as string;
+            property.WriteTo(writer);
             
 
         }

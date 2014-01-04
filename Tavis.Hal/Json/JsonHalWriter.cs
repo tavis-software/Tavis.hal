@@ -10,13 +10,13 @@ namespace Tavis
 {
     public class JsonHalWriter : IHalWriter
     {
-        public void CopyToStream(HalDocument document, Stream stream)
+        public void CopyToStream(HalResource document, Stream stream)
         {
             var stringBuilder = new StringBuilder();
             using (var writer = new JsonTextWriter(new StringWriter(stringBuilder)) {Formatting = Formatting.Indented})
             {
-                
-                WriteDocument(document, writer);
+
+                WriteResource(document, writer);
             }
 
             var sw = new StreamWriter(stream);
@@ -24,12 +24,12 @@ namespace Tavis
             sw.Flush();
         }
 
-        public Stream ToStream(HalDocument document)
+        public Stream ToStream(HalResource document)
         {
             var stringBuilder = new StringBuilder();
             using (var writer = new JsonTextWriter(new StringWriter(stringBuilder)) { Formatting = Formatting.Indented })
             {
-                WriteDocument(document, writer);
+                WriteResource(document, writer);
             }
 
             var stream = new MemoryStream();
@@ -43,19 +43,16 @@ namespace Tavis
 
 
 
-        public static void WriteDocument(HalDocument halDocument, JsonWriter writer)
-        {
-            WriteResource(halDocument.Root, writer, halDocument.Namespaces);
-        }
 
-        internal static void WriteResource(HalResource halResource, JsonWriter writer, IEnumerable<HalNamespace> namespaces = null)
+
+        internal static void WriteResource(HalResource halResource, JsonWriter writer)
         {
             writer.WriteStartObject();
 
-            if (halResource.Href != null)
+            if (halResource.Link.Target != null)
             {
                 writer.WritePropertyName("href");
-                writer.WriteValue(halResource.Href);
+                writer.WriteValue(halResource.Link.Target.OriginalString);
             }
 
             if (!string.IsNullOrEmpty(halResource.Name))
@@ -63,12 +60,13 @@ namespace Tavis
                 writer.WritePropertyName("name");
                 writer.WriteValue(halResource.Name);
             }
-            if (!string.IsNullOrEmpty(halResource.Type))
+            if (halResource.Link.Type != null)
             {
                 writer.WritePropertyName("type");
-                writer.WriteValue(halResource.Type);
+                writer.WriteValue(halResource.Link.Type.ToString());
             }
 
+            var namespaces = halResource.Namespaces;
             if ((namespaces != null) && (namespaces.Any()))
             {
                 writer.WritePropertyName("_curies");
@@ -76,13 +74,13 @@ namespace Tavis
                 foreach (var @namespace in namespaces)
                 {
                     writer.WritePropertyName(@namespace.Prefix);
-                    writer.WriteValue(@namespace.Namespace.AsString());
+                    writer.WriteValue(@namespace.Namespace.OriginalString);
                 }
                 writer.WriteEndObject();
 
             }
 
-            var links = halResource.Contents.Values.Where(h => h is HalLink) .Cast<HalLink>().ToList();
+            var links = halResource.Contents.Where(h => h is HalLink) .Cast<HalLink>().ToList();
             if (links.Any())
             {
                 writer.WritePropertyName("_links");
@@ -96,7 +94,7 @@ namespace Tavis
 
             }
 
-            var properties = halResource.Contents.Values.Where(h => h is IHalProperty).Cast<IHalProperty>().ToList();
+            var properties = halResource.Contents.Where(h => h is IHalProperty).Cast<IHalProperty>().ToList();
             if (properties.Any())
             {
                 foreach (var halProperty in properties)
@@ -105,14 +103,14 @@ namespace Tavis
                 }
             }
 
-            var resources = halResource.Contents.Values.Where(h => h is HalResource).Cast<HalResource>().ToList();
+            var resources = halResource.Contents.Where(h => h is HalResource).Cast<HalResource>().ToList();
             if (resources.Any())
             {
                 writer.WritePropertyName("_embedded");
                 writer.WriteStartObject();
                 foreach (var halChildResource in resources)
                 {
-                    writer.WritePropertyName(halChildResource.Rel);
+                    writer.WritePropertyName(halChildResource.Link.Relation);
                     WriteResource(halChildResource,writer);
                 }
                 writer.WriteEndObject();
@@ -138,13 +136,8 @@ namespace Tavis
 
         internal static void WriteProperty(IHalProperty halProperty, JsonWriter writer)
         {
-            var content = halProperty.GetContent() as JProperty;
-            if (content != null)
-            {
-                content.WriteTo(writer);
-            }
-
-
+            var property = new JProperty(halProperty.Name,halProperty.GetValue());
+            property.WriteTo(writer);
         }
 
 

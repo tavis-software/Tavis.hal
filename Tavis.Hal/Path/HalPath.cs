@@ -1,10 +1,9 @@
-using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace Tavis {
     public class HalPath {
-        //private Regex _PathRegex = new Regex(@"/?(\w+)(?:\[(\w+)\])?");
+        
         private Regex _PathRegex = new Regex(@"/?([\w\:]+)(?:\[(\w+)\])?");
         private readonly List<Segment> _Segments = new List<Segment>();
         
@@ -29,13 +28,4 @@ namespace Tavis {
 			public string Key { get; internal set; }
         }
     }
-
-
-	public class HalPathException : Exception
-	{
-		public HalPathException(string message = "Invalid HAL path")
-			: base(message)
-		{	
-		}
-	}
 }
