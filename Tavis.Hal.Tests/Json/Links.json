@@ -1,0 +1,6 @@
+﻿{
+  "_links" : { 
+			"about" : {  "href" : "http://example.org/about"},
+			"next" : { 	 "href" : "http://example.org/next"}
+			}
+}

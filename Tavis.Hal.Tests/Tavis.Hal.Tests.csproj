@@ -83,10 +83,17 @@
     <Compile Include="HalMappingTests.cs" />
     <Compile Include="HalTests.cs" />
     <Compile Include="JsonHalTests.cs" />
+    <Compile Include="JsonReaderTests.cs" />
     <Compile Include="PathTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Json\Simple.json" />
+    <EmbeddedResource Include="Json\Empty.json" />
+    <EmbeddedResource Include="Json\Links.json" />
+    <EmbeddedResource Include="Json\EmbeddedArray.json" />
+    <EmbeddedResource Include="Json\Embedded.json" />
+    <None Include="Json\SpecSample.json" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

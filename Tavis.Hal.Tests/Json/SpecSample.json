@@ -1,0 +1,46 @@
+﻿{
+  "href": "http://example.org",
+  "_curies": {
+    "td": "http://mytodoapp.com/rels/"
+  },
+  "_links": {
+    "td:search": {
+      "href": "/todo-list/search;{searchterm}"
+    },
+    "td:description": {
+      "href": "/todo-list/description"
+    }
+  },
+  "created_at" : "2010-01-16",
+  "updated_at": "2010-02-21",
+  "summary": "An example list",
+  "_embedded": {
+    "td:owner": {
+      "href": "http://range14sux.com/mike",
+      "_links": {
+        "td:friend": {
+          "href": "http://mamund.com/"
+        }
+      },
+      "name": "Mike",
+      "age": "36"
+    },
+    "td:item": {
+      "href": "http://home.com/tasks/126",
+      "name": "1",
+      "title": "Find Mug",
+      "details": "Find my mug."
+    },
+    "td:item": {
+      "href": "http://work.com/todos/make-some-tea",
+      "name": "2",
+      "_links": {
+        "td:prev": {
+          "href": "http://home.com/tasks/126"
+        }
+      },
+      "title": "Make tea",
+      "details": "Mike nice tea that is green. (Gyokuro)"
+    }
+  }
+}

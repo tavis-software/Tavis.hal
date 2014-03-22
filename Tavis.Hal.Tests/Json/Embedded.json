@@ -1,0 +1,6 @@
+﻿{
+  "_embedded" : { 
+			"http://example.org/rels/order" : {  "code" : "1001"},
+			"http://example.org/rels/customer" : { 	 "name" : "Acme Inc."}
+			}
+}
