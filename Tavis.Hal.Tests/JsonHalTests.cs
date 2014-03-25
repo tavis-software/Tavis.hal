@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 using Tavis.IANA;
 using Xunit;
 
@@ -14,15 +15,45 @@ namespace Tavis.Hal.Tests
     {
 
         [Fact]
+        public void EmptyHalDocument()
+        {
+            var hal = new HalResource();
+
+            
+            var output = HalToString(hal);
+            Assert.Equal(output,"{}");
+        }
+
+        [Fact]
+        public void HalWithSelfLink()
+        {
+            var hal = new HalResource(new SelfLink(){Target = new Uri("http://example.org/foo")});
+
+            var output = JToken.Parse(HalToString(hal));
+            Assert.True(JToken.DeepEquals(output, JToken.Parse(@"{ '_links' : { 'self' : { 'href': 'http://example.org/foo'}}}")));
+        }
+
+
+
+        private static string HalToString(HalResource hal)
+        {
+            var jsonhalWriter = new JsonHalWriter();
+            var stream = jsonhalWriter.ToStream(hal);
+            var sr = new StreamReader(stream);
+            return sr.ReadToEnd();
+        }
+
+
+        [Fact]
         public void CreateHalManually()
         {
             var hal = new HalResource(new SelfLink() { Target = new Uri("http://example.org") },
-                new HalResource(new Link() {Relation="foo", Target=new Uri("http://example.org/foo")}),
-                new Link()
-                {
-                    Relation = "bar",
-                    Target = new Uri("http://example.org/bar")
-                }
+                            new HalResource(new Link() { Relation="foo", Target = new Uri("http://example.org/foo") }),
+                            new Link()
+                            {
+                                Relation = "bar",
+                                Target = new Uri("http://example.org/bar")
+                            }
                 );
 
             var jsonhalWriter = new JsonHalWriter();

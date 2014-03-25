@@ -16,7 +16,11 @@ namespace Tavis {
 
         public string Href
         {
-            get { return Link.Target.OriginalString; }
+            get
+            {
+                if (Link.Target == null) return null;
+                return Link.Target.OriginalString;
+            }
         }
 
         public override string Key {

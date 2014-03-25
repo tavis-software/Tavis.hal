@@ -49,23 +49,8 @@ namespace Tavis
         {
             writer.WriteStartObject();
 
-            if (halResource.Link.Target != null)
-            {
-                writer.WritePropertyName("href");
-                writer.WriteValue(halResource.Link.Target.OriginalString);
-            }
 
-            if (!string.IsNullOrEmpty(halResource.Name))
-            {
-                writer.WritePropertyName("name");
-                writer.WriteValue(halResource.Name);
-            }
-            if (halResource.Link.Type != null)
-            {
-                writer.WritePropertyName("type");
-                writer.WriteValue(halResource.Link.Type.ToString());
-            }
-
+            
             var namespaces = halResource.Namespaces;
             if ((namespaces != null) && (namespaces.Any()))
             {
@@ -81,7 +66,8 @@ namespace Tavis
             }
 
             var links = halResource.Contents.Where(h => h is HalLink) .Cast<HalLink>().ToList();
-            if (links.Any())
+            if (halResource.Link != null) links.Insert(0, new HalLink(halResource.Link));
+            if (links.Any() || halResource.Link != null)
             {
                 writer.WritePropertyName("_links");
                 writer.WriteStartObject();
@@ -120,8 +106,25 @@ namespace Tavis
             writer.WriteEndObject();
         }
 
+        private static void RenderSelfLink(HalResource halResource, JsonWriter writer)
+        {
+            if (halResource.Link.Target != null)
+            {
+                writer.WritePropertyName("href");
+                writer.WriteValue(halResource.Link.Target.OriginalString);
+            }
 
-        
+            if (!string.IsNullOrEmpty(halResource.Name))
+            {
+                writer.WritePropertyName("name");
+                writer.WriteValue(halResource.Name);
+            }
+            if (halResource.Link.Type != null)
+            {
+                writer.WritePropertyName("type");
+                writer.WriteValue(halResource.Link.Type.ToString());
+            }
+        }
 
 
         internal static void WriteLink(HalLink halLink, JsonWriter writer)

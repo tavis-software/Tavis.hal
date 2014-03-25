@@ -35,6 +35,10 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Newtonsoft.Json.6.0.1\lib\net40\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.IO">
@@ -83,6 +87,8 @@
     <Compile Include="HalMappingTests.cs" />
     <Compile Include="HalTests.cs" />
     <Compile Include="JsonHalTests.cs" />
+    <Compile Include="JsonPointer\JsonPointer.cs" />
+    <Compile Include="JsonPointer\JsonPointerTests.cs" />
     <Compile Include="JsonReaderTests.cs" />
     <Compile Include="PathTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -93,6 +99,7 @@
     <EmbeddedResource Include="Json\Links.json" />
     <EmbeddedResource Include="Json\EmbeddedArray.json" />
     <EmbeddedResource Include="Json\Embedded.json" />
+    <None Include="app.config" />
     <None Include="Json\SpecSample.json" />
     <None Include="packages.config" />
   </ItemGroup>

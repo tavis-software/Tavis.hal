@@ -14,7 +14,7 @@ namespace Tavis {
         
         internal readonly IList<HalNamespace> Namespaces;
 
-        public HalResource() : this(new SelfLink())
+        public HalResource() : this(null)
         {
         }
 
